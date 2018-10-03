@@ -85,7 +85,7 @@ def out_match_context(lines, regexp, before, after,
             if cur_left < 0: cur_left = 0
             cur_right = idx + after
             if cur_right > len(lines) - 1: cur_right = len(lines) - 1
-            if left is right:
+            if left is False is right:
                 left = cur_left
                 right = cur_right
             elif cur_left <= right:
@@ -96,7 +96,7 @@ def out_match_context(lines, regexp, before, after,
                     matches_idx.clear()
                     left = cur_left
                     right = cur_right
-    if left is not right:
+    if left is not False:
         for i in range(left, right+1):
             output_line(lines[i], i+1 if line_number else False, i not in matches_idx)
 
