@@ -8,20 +8,20 @@ def output(line):
     print(line)
 
 
-def output_line(line, line_number=False, non_match=False):
+def output_line(line, line_number=False, match=True):
     """
     Adds to line proper leading symbols if needed
 
     Keyword arguments:
         line(str):        line to output
         line_number(int): should be line numbered
-        non_match(bool):  if current line satisfy pattern (":" or "-" will be added)
+        match(bool):      if current line satisfy pattern (":" or "-" will be added)
     Returns:
     """
-    if line_number and non_match:
-        output(str(line_number) + '-' + line)
-    elif line_number:
+    if line_number and match:
         output(str(line_number) + ':' + line)
+    elif line_number:
+        output(str(line_number) + '-' + line)
     else:
         output(line)
 
@@ -72,7 +72,7 @@ def out_match_context(lines, regexp, before, after,
         after(int):         context after
         invert(int):        invert regexp match
         line_number(bool):  number lines
-    Returns
+    Returns:
     """
     left = False
     right = False
@@ -85,20 +85,21 @@ def out_match_context(lines, regexp, before, after,
             if cur_left < 0: cur_left = 0
             cur_right = idx + after
             if cur_right > len(lines) - 1: cur_right = len(lines) - 1
-            if left is False is right:
+            if left is False:
                 left = cur_left
                 right = cur_right
             elif cur_left <= right:
                 right = cur_right
             else:
                 for i in range(left, right+1):
-                    output_line(lines[i], i+1 if line_number else False, i not in matches_idx)
-                    matches_idx.clear()
+                    match = i in matches_idx
+                    if match: matches_idx.remove(i)
+                    output_line(lines[i], i+1 if line_number else False, match)
                     left = cur_left
                     right = cur_right
     if left is not False:
         for i in range(left, right+1):
-            output_line(lines[i], i+1 if line_number else False, i not in matches_idx)
+            output_line(lines[i], i+1 if line_number else False, i in matches_idx)
 
 
 def grep(lines, params):
