@@ -9,6 +9,15 @@ def output(line):
 
 
 def output_line(line, line_number=False, non_match=False):
+    """
+    Adds to line proper leading symbols if needed
+
+    Keyword arguments:
+        line(str):        line to output
+        line_number(int): should be line numbered
+        non_match(bool):  if current line satisfy pattern (":" or "-" will be added)
+    Returns:
+    """
     if line_number and non_match:
         output(str(line_number) + '-' + line)
     elif line_number:
@@ -18,6 +27,16 @@ def output_line(line, line_number=False, non_match=False):
 
 
 def count(lines, regexp, invert=False):
+    """
+    Count lines matches regexp.
+
+    Args:
+        lines(list):          lines to process
+        regexp(SRE_Pattern):  regexp to check
+        invert(bool):         invert regexp match
+    Returns:
+        Number of lines matching regexp
+    """
     counter = 0
     for line in lines:
         if bool(regexp.search(line)) != invert:
@@ -26,6 +45,16 @@ def count(lines, regexp, invert=False):
 
 
 def out_match(lines, regexp, invert=False, line_number=False):
+    """
+    Outputs lines matching regexp
+
+    Args:
+        lines(list):         lines to process
+        regexp(SRE_Pattern): regexp to check
+        invert(bool):        invert regexp match
+        line_number(bool):   number lines
+    Returns:
+    """
     for idx, line in enumerate(lines):
         if bool(regexp.search(line)) != invert:
             output_line(line, idx+1 if line_number else False)
@@ -33,6 +62,18 @@ def out_match(lines, regexp, invert=False, line_number=False):
 
 def out_match_context(lines, regexp, before, after,
                       invert=False, line_number=False):
+    """
+    Outputs lines matching regexp with context __after__ and __before__
+
+    Args:
+        lines(list):        lines to process
+        regexp(SRE_Pattern):regexp to check
+        before(int):        context before
+        after(int):         context after
+        invert(int):        invert regexp match
+        line_number(bool):  number lines
+    Returns
+    """
     left = False
     right = False
     matches_idx = []
