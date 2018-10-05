@@ -12,6 +12,7 @@ def save_to_list(line):
 
 grep.output = save_to_list
 
+
 class GrepBaseTest(TestCase):
 
     lines = ['baab', 'bbb', 'ccc', 'A']
@@ -44,6 +45,7 @@ class GrepBaseTest(TestCase):
         params = grep.parse_args(['-i', 'a'])
         grep.grep(self.lines, params)
         self.assertEqual(lst, ['baab', 'A'])
+
 
 class GrepPatternTest(TestCase):
 
@@ -88,6 +90,7 @@ class GrepPatternTest(TestCase):
         grep.grep(self.lines, params)
         self.assertEqual(lst, self.lines)
 
+
 class GrepContextTest(TestCase):
 
     lines = ['vr','baab', 'abbb', 'fc', 'bbb', 'cc']
@@ -121,6 +124,7 @@ class GrepContextTest(TestCase):
         grep.grep(self.lines, params)
         self.assertEqual(lst, ['abbb', 'fc', 'bbb', 'cc'])
 
+
 class GrepLineNumbersTest(TestCase):
 
     lines = ['vr','baab', 'abbb', 'fc', 'bbb', 'cc']
@@ -143,3 +147,11 @@ class GrepLineNumbersTest(TestCase):
         params = grep.parse_args(['-n', '-C1', '???'])
         grep.grep(self.lines, params)
         self.assertEqual(lst, ['1-vr', '2:baab', '3:abbb', '4-fc', '5:bbb', '6-cc'])
+
+
+# class GrepCompareRandomTest(TestCase):
+#
+#     literals = ['a', 'b', 'c', 'd', 'e', 'f', 'g',
+#                 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+#                 'o', 'p', 'q', 'r', 's', 't', 'u',
+#                 'v', 'w', 'x', 'y', 'z', '.',]

@@ -110,8 +110,8 @@ def grep(lines, params):
         output(str(result))
 
     elif params.context or params.after_context or params.before_context:
-        before = params.context if params.context >= params.before_context else params.before_context
-        after = params.context if params.context >= params.after_context else params.after_context
+        before = max(params.context, params.before_context)
+        after = max(params.context, params.after_context)
         out_match_context(lines, regexp, before, after,
                           params.invert, params.line_number)
 
