@@ -2,6 +2,7 @@
 import argparse
 import sys
 import re
+from collections import deque
 
 
 def output(line):
@@ -26,47 +27,55 @@ def output_line(line, line_number=False, match=True):
         output(line)
 
 
-def count(lines, regexp, invert=False):
+def count(stdin, regexp, invert=False):
     """
     Count lines matches regexp.
 
     Args:
-        lines(list):          lines to process
+        stdin:                stdin to process
         regexp(SRE_Pattern):  regexp to check
         invert(bool):         invert regexp match
     Returns:
         Number of lines matching regexp
     """
     counter = 0
-    for line in lines:
+    while True:
+        line = stdin.readline().rstrip()
+        if not line:
+            break
         if bool(regexp.search(line)) != invert:
             counter += 1
     return counter
 
 
-def out_match(lines, regexp, invert=False, line_number=False):
+def out_match(stdin, regexp, invert=False, line_number=False):
     """
     Outputs lines matching regexp
 
     Args:
-        lines(list):         lines to process
+        stdin:               stdin to process
         regexp(SRE_Pattern): regexp to check
         invert(bool):        invert regexp match
         line_number(bool):   number lines
     Returns:
     """
-    for idx, line in enumerate(lines):
+    idx = 0
+    while True:
+        line = stdin.readline().rstrip()
+        if not line:
+            break
         if bool(regexp.search(line)) != invert:
-            output_line(line, idx+1 if line_number else False)
+            idx += 1
+            output_line(line, idx if line_number else False)
 
 
-def out_match_context(lines, regexp, before, after,
+def out_match_context(stdin, regexp, before, after,
                       invert=False, line_number=False):
     """
     Outputs lines matching regexp with context __after__ and __before__
 
     Args:
-        lines(list):        lines to process
+        stdin:              stdin to process
         regexp(SRE_Pattern):regexp to check
         before(int):        context before
         after(int):         context after
@@ -74,32 +83,27 @@ def out_match_context(lines, regexp, before, after,
         line_number(bool):  number lines
     Returns:
     """
-    left = False
-    right = False
-    matches_idx = []
-    for idx in range(len(lines)):
-        lines[idx] = lines[idx].rstrip()
-        if bool(regexp.search(lines[idx])) != invert:
-            matches_idx.append(idx)
-            cur_left = idx - before
-            if cur_left < 0: cur_left = 0
-            cur_right = idx + after
-            if cur_right > len(lines) - 1: cur_right = len(lines) - 1
-            if left is False:
-                left = cur_left
-                right = cur_right
-            elif cur_left <= right:
-                right = cur_right
-            else:
-                for i in range(left, right+1):
-                    match = i in matches_idx
-                    if match: matches_idx.remove(i)
-                    output_line(lines[i], i+1 if line_number else False, match)
-                    left = cur_left
-                    right = cur_right
-    if left is not False:
-        for i in range(left, right+1):
-            output_line(lines[i], i+1 if line_number else False, i in matches_idx)
+    idx = 0
+    deq = deque(maxlen=before)
+    to_print_after = 0
+    while True:
+        line = stdin.readline().rstrip()
+
+        if not line:
+            break
+        idx += 1
+
+        if bool(regexp.search(line)) != invert:
+            to_print_after = after
+            for linet in deq:
+                output_line(linet[0], linet[1] if line_number else False, False)
+            deq.clear()
+            output_line(line, idx)
+        elif to_print_after:
+            output_line(line, idx, False)
+            to_print_after -= 1
+        else:
+            deq.append((line, idx))
 
 
 def grep(lines, params):
@@ -172,7 +176,7 @@ def parse_args(args):
 
 def main():
     params = parse_args(sys.argv[1:])
-    grep(sys.stdin.readlines(), params)
+    grep(sys.stdin, params)
 
 
 if __name__ == '__main__':
