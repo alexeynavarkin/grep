@@ -27,51 +27,51 @@ def output_line(line, line_number=False, match=True):
         output(line)
 
 
-def count(stdin, regexp, invert=False):
+def count(lines, regexp, invert=False):
     """
     Count lines matches regexp.
 
     Args:
-        stdin:                stdin to process
+        lines(iterable):      lines to process
         regexp(SRE_Pattern):  regexp to check
         invert(bool):         invert regexp match
     Returns:
         Number of lines matching regexp
     """
     counter = 0
-    for line in stdin:
+    for line in lines:
         line = line.rstrip()
         if bool(regexp.search(line)) != invert:
             counter += 1
     return counter
 
 
-def out_match(stdin, regexp, invert=False, line_number=False):
+def out_match(lines, regexp, invert=False, line_number=False):
     """
     Outputs lines matching regexp
 
     Args:
-        stdin:               stdin to process
+        lines(iterable):     lines to process
         regexp(SRE_Pattern): regexp to check
         invert(bool):        invert regexp match
         line_number(bool):   number lines
     Returns:
     """
     idx = 0
-    for line in stdin:
+    for line in lines:
         idx += 1
         line = line.rstrip()
         if bool(regexp.search(line)) != invert:
             output_line(line, idx if line_number else False)
 
 
-def out_match_context(stdin, regexp, before, after,
+def out_match_context(lines, regexp, before, after,
                       invert=False, line_number=False):
     """
     Outputs lines matching regexp with context __after__ and __before__
 
     Args:
-        stdin:              stdin to process
+        lines(iterable):    lines to process
         regexp(SRE_Pattern):regexp to check
         before(int):        context before
         after(int):         context after
@@ -82,15 +82,15 @@ def out_match_context(stdin, regexp, before, after,
     idx = 0
     deq = deque(maxlen=before)
     to_print_after = 0
-    for line in stdin:
+    for line in lines:
         line = line.rstrip()
         idx += 1
 
         if bool(regexp.search(line)) != invert:
             to_print_after = after
-            for linet in deq:
+            while deq:
+                linet = deq.popleft()
                 output_line(linet[0], linet[1] if line_number else False, False)
-            deq.clear()
             output_line(line, idx if line_number else False)
         elif to_print_after:
             output_line(line, idx if line_number else False, False)
