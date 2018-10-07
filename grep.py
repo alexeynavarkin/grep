@@ -39,10 +39,8 @@ def count(stdin, regexp, invert=False):
         Number of lines matching regexp
     """
     counter = 0
-    while True:
-        line = stdin.readline().rstrip()
-        if not line:
-            break
+    for line in stdin:
+        line = line.rstrip()
         if bool(regexp.search(line)) != invert:
             counter += 1
     return counter
@@ -60,12 +58,10 @@ def out_match(stdin, regexp, invert=False, line_number=False):
     Returns:
     """
     idx = 0
-    while True:
-        line = stdin.readline().rstrip()
-        if not line:
-            break
+    for line in stdin:
+        idx += 1
+        line = line.rstrip()
         if bool(regexp.search(line)) != invert:
-            idx += 1
             output_line(line, idx if line_number else False)
 
 
@@ -86,11 +82,8 @@ def out_match_context(stdin, regexp, before, after,
     idx = 0
     deq = deque(maxlen=before)
     to_print_after = 0
-    while True:
-        line = stdin.readline().rstrip()
-
-        if not line:
-            break
+    for line in stdin:
+        line = line.rstrip()
         idx += 1
 
         if bool(regexp.search(line)) != invert:
@@ -98,9 +91,9 @@ def out_match_context(stdin, regexp, before, after,
             for linet in deq:
                 output_line(linet[0], linet[1] if line_number else False, False)
             deq.clear()
-            output_line(line, idx)
+            output_line(line, idx if line_number else False)
         elif to_print_after:
-            output_line(line, idx, False)
+            output_line(line, idx if line_number else False, False)
             to_print_after -= 1
         else:
             deq.append((line, idx))
